@@ -42,6 +42,22 @@ To get the SSH password for the `ushahidi` user so you can login and edit files,
 
     $ docker logs <container-id>
 
+### Additional Commands
+
+To see what docker images are currently created, use the `ps` command:
+
+    $ docker ps -a
+
+If there are any images that are stopped and can be removed, use the `rm` command:
+
+    $ docker rm <image-id>
+
+If you get a warning about the image needing to be stopped, use the `stop` command first:
+
+    $ docker stop <image-id>
+
+For additional commands, see `docker help` and the [Docker User Guide](https://docs.docker.com/userguide/).
+
 # Credits
 
 This Docker container is heavily based on work by [oskarhane](https://github.com/oskarhane/docker-wordpress-nginx-ssh) and [eugeneware](https://github.com/eugeneware/docker-wordpress-nginx).
