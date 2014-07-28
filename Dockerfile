@@ -1,6 +1,6 @@
 FROM ubuntu
-MAINTAINER Eugene Ware <eugene@noblesamurai.com>
-RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
+MAINTAINER Woody Gilk <woody@ushahidi.com>
+RUN echo "deb http://archive.ubuntu.com/ubuntu trusty main universe" > /etc/apt/sources.list
 RUN apt-get update
 RUN apt-get -y upgrade
 
@@ -12,8 +12,8 @@ RUN mkdir /var/run/sshd
 # Basic Requirements
 RUN apt-get -y install memcached mysql-server mysql-client nginx php5-fpm php5-mysql php-apc pwgen python-setuptools curl git unzip openssh-server openssl
 
-# Wordpress Requirements
-RUN apt-get -y install php5-curl php5-gd php5-intl php-pear php5-imagick php5-imap php5-mcrypt php5-memcache php5-memcached php5-ming php5-ps php5-pspell php5-recode php5-snmp php5-sqlite php5-tidy php5-xmlrpc php5-xsl
+# Platform Requirements
+RUN apt-get -y install php5-curl php5-mcrypt php5-memcached
 
 # mysql config
 RUN sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/my.cnf
@@ -36,23 +36,23 @@ ADD ./nginx-site.conf /etc/nginx/sites-available/default
 RUN /usr/bin/easy_install supervisor
 ADD ./supervisord.conf /etc/supervisord.conf
 
-#Add system user for Wordpress
-RUN useradd -m -d /home/wordpress -p $(openssl passwd -1 'temp') -G sudo -s /bin/bash wordpress 
-RUN ln -s /usr/share/nginx/www /home/wordpress/www
+# Add system user for Ushahidi Platform
+RUN useradd -m -d /home/ushahidi -p $(openssl passwd -1 'temp') -G sudo -s /bin/bash ushahidi
+RUN ln -s /usr/share/nginx/www /home/ushahidi/www
 
 # SSH security, turn off root login
 RUN sed -i -e "s/PermitRootLogin\syes/PermitRootLogin no/g" /etc/ssh/sshd_config
 
-# Install Wordpress
-ADD http://wordpress.org/latest.tar.gz /usr/share/nginx/latest.tar.gz
+# Install Ushahidi Platform
+ADD ./database.config.php /tmp/database.config.php
+ADD https://72c9192a7b87de5fc63a-f9fe2e6be12470a7bff22b7693bc7329.ssl.cf1.rackcdn.com/V3/Ushahidi-Platform-v3.0.0-beta.4.tar.gz /usr/share/nginx/latest.tar.gz
 RUN cd /usr/share/nginx/ && tar xvf latest.tar.gz && rm latest.tar.gz
-RUN mv /usr/share/nginx/www/5* /usr/share/nginx/wordpress
 RUN rm -rf /usr/share/nginx/www
-RUN mv /usr/share/nginx/wordpress /usr/share/nginx/www
-RUN chown -R wordpress:www-data /usr/share/nginx/www
+RUN mv /usr/share/nginx/platform /usr/share/nginx/www
+RUN chown -R ushahidi:www-data /usr/share/nginx/www
 RUN chmod -R 775 /usr/share/nginx/www
 
-# Wordpress Initialization and Startup Script
+# Platform Initialization and Startup Script
 ADD ./start.sh /start.sh
 RUN chmod 755 /start.sh
 

@@ -1,39 +1,47 @@
-# docker-wordpress-nginx-ssh
+# Docker Container for Ushahidi Platform
 
-A Dockerfile that installs the latest wordpress, nginx, php-apc, php-fpm and openssh.  
-Now with memcached caching straight from NGiNX!
-
-This is a modified fork from [eugeneware](https://github.com/eugeneware/docker-wordpress-nginx). All credits should go to him.
+A Dockerfile that installs the latest [Ushahidi Platform](https://github.com/ushahidi/platform) running on nginx and php-fpm, with a MySQL database. It will also set up OpenSSH for additional management.
 
 ## Installation
 
-    $ git clone https://github.com/oskarhane/docker-wordpress-nginx-ssh.git
-    $ cd docker-wordpress-nginx-ssh
-    $ sudo docker build -t="docker-wordpress-nginx-ssh" .
+This guide assumes that you will be running Docker [without sudo](https://docs.docker.com/installation/binaries/#giving-non-root-access). Please make sure that Docker is configured properly before running any of these commands. (If you are on Mac OSX, note that Docker on OSX is automatically configured to not require `sudo`)
+
+    $ git clone https://github.com/ushahidi/docker-ushahidi-platform.git
+    $ cd docker-ushahidi-platform
+    $ docker build -t="docker-ushahidi-platform" .
+
+
+### On Mac OSX
+If you have not previously run Docker on OSX, read the [OSX install guide](https://docs.docker.com/installation/mac/) first. Before you will be able to run any docker commands, you will need to run `boot2docker start` and then run the `export DOCKER_HOST=tcp://ip:port` command that it lists.
+
+**Also note that ports are bound to a dynamic IP address, not `0.0.0.0`. The bridging IP address can be found by running `boot2docker ip`. Replacing `0.0.0.0` with this IP in the instructions below.**
 
 ## Usage
 
-To spawn a new instance of wordpress:
+To spawn a new instance of ushahidi:
 
-    $ sudo docker run -p 80 -p 22 -d -t docker-wordpress-nginx-ssh
+    $ docker run -p 80 -p 22 -d -t docker-ushahidi-platform
 
-You'll see an ID output like: `d404cc2fa27b`
+You'll see an ID output like `1d72c3c85840637d9d73d25818049952c0d98b64fde6b3c0d8645b08127b15e5`. This is your **container id**, which can also be shorted to 12 characters like `1d72c3c858`.
 
 Use this ID to check the port it's on:
 
-    $ sudo docker port d404cc2fa27b 80 # Make sure to change the ID to yours!
+    $ docker port 1d72c3c858 80 # Make sure to change the ID to yours!
 
-This command returns the container ID, which you can use to find the external port you can use to access Wordpress from your host machine:
+This command returns the container ID, which you can use to find the external port you can use to access Ushahidi Platform from your host machine:
 
     $ docker port <container-id> 80
 
 You can the visit the following URL in a browser on your host machine to get started:
 
-    http://127.0.0.1:<port>
+    http://0.0.0.0:<port>
 
-To enable memcached caching straight from NGiNX, goto WP-FFPC settings page and press the save button. Thats it.
+*This address will be different if you are using OSX! See the additional instructions above.*
 
-
-To get the SSH user `wordpress`'s password so you can login and edit files, check the top of the docker container logs for it.
+To get the SSH password for the `ushahidi` user so you can login and edit files, check the top of the docker container logs for it:
 
     $ docker logs <container-id>
+
+# Credits
+
+This Docker container is heavily based on work by [oskarhane](https://github.com/oskarhane/docker-wordpress-nginx-ssh) and [eugeneware](https://github.com/eugeneware/docker-wordpress-nginx).
